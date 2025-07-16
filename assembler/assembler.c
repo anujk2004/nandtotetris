@@ -4,7 +4,7 @@
 
 
 
-void ramlocation(char *buffer , int size ,FILE *pFile, FILE *pFileout);
+void bininstruct(char *buffer , int size ,FILE *pFile, FILE *pFileout);
 int main(){
     //printf("start\n");
 
@@ -22,14 +22,14 @@ int main(){
     }
 
 
-    ramlocation(buffer , sizeof(buffer) ,pFile , pFileout);
+    bininstruct(buffer , sizeof(buffer) ,pFile , pFileout);
     
       fclose(pFileout);
       fclose(pFile);
 return 0;
 }
 
-void ramlocation(char *buffer , int size , FILE *pFile, FILE *pFileout){
+void bininstruct(char *buffer , int size , FILE *pFile, FILE *pFileout){
 
 
     while (fgets(buffer, size, pFile)){
