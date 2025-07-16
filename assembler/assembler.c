@@ -21,6 +21,7 @@ int main(){
         return 1;
     }
 
+
     ramlocation(buffer , sizeof(buffer) ,pFile , pFileout);
     
       fclose(pFileout);

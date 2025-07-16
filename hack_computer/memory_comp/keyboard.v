@@ -21,6 +21,9 @@
 module keyboard( input clk, output reg [15:0] out
     );
 	 reg[15:0] keypress;
+	 initial begin
+	 keypress = 16'd65;
+	 end
 	 
 	always@(posedge clk) begin
 		out <=keypress;

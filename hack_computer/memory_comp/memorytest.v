@@ -32,7 +32,7 @@ module memorytest;
 
 	// Outputs
 	wire [15:0] out;
-
+	reg[80:0] comp;
 	// Instantiate the Unit Under Test (UUT)
 	memory uut (
 		.in(in), 
@@ -41,22 +41,68 @@ module memorytest;
 		.clk(clk), 
 		.out(out)
 	);
-	initial begin
-		force kb.keypress(16'h0041);
-		end
+
+		
+	initial begin 
+	clk =0;
+	forever #5clk = ~clk;
+	end
 	initial begin
 		// Initialize Inputs
-		in = 0;
-		address = 0;
+		in = 16'hff;
+		address = 15'h00ff;
 		load = 0;
-		clk = 0;
-
-		// Wait 100 ns for global reset to finish
-		#100;
-        
+		#10;
+		#10;
+		in = 16'hff;
+		address = 15'h00ff;
+		load = 1;
+		#10;
+		#10;
+		in = 16'hffff;
+		address = 15'h50ff;
+		load = 1;
+		#10;
+		#10;
+		in = 16'hff12;
+		address = 15'h6000;
+		load = 1;
+		#10;
+		#10;
+		in = 16'hff12;
+		address = 15'h7000;
+		load = 1;
+		#10;
+		
+	#10;
+        #10;
+		  in = 16'hff12;
+		address = 15'h70f0;
+		load = 1;
+		#10;
 		// Add stimulus here
 
 	end
-      
+	
+	always @(*) begin
+    case(address[14:13])
+        2'b00: comp ="ram";
+        2'b01: comp ="ram";
+		   2'b10: comp ="screen";
+        2'b11:begin
+		  if (address[14:0] == 15'h6000)begin
+		  comp = "keyboard";
+		  end
+		  else begin
+		  comp="rest_spce";
+		  end
+		  end
+        default: comp = "rest_space";
+    endcase
+end
+
+	initial begin
+     $monitor("time:%t , in:%h , address:%h,out:%h  comp:%s" ,$time,in,address,out,comp); 
+	  end
 endmodule
 

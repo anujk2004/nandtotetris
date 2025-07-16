@@ -21,7 +21,7 @@
 module mux16( input [15:0] in1 , input [15:0] in2 , input  sel , output reg [15:0] out
     );
 always @(*) begin
-  if (sel == 1 )
+  if (sel == 0 )
 		out = in1;
 	else 
 	out = in2;
