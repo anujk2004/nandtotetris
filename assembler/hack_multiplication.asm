@@ -1,20 +1,20 @@
-// R0 = multiplicand (e.g., 2)
+
 @2
 D=A
 @R0
 M=D
 
-// R1 = multiplier (e.g., 5)
+
 @5
 D=A
 @R1
 M=D
 
-// R3 = result (initialize to 0)
+
 @R3
 M=0
 
-// i = 0
+
 @0
 D=A
 @i

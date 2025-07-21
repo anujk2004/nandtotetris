@@ -41,11 +41,11 @@ always @(*)begin
 end
 
 mux16 mux1(.in1(instr) , .in2(outM), .sel(instr[15]), .out(mux1_out));
-reg16 Areg(.in(mux1_out) , .load(instr[5]) , .clk(clk) ,.out(Areg_out) );
+reg16 Areg(.in(mux1_out) , .load(~instr[15]|instr[5]) , .clk(clk) ,.out(Areg_out) );
 mux16 mux2(.in1(Areg_out), .in2(inM), .sel(instr[12]), .out(mux2_out));
 reg16 Dreg (.in(outM) , .load(instr[4]), .clk(clk),  .out(Dreg_out));
 alu  alu(.x(Dreg_out), .y(mux2_out) ,.zx(instr[11]) ,.nx(instr[10]) ,.zy(instr[9]) ,.ny(instr[8]) ,.f(instr[7]) ,.no(instr[6]) ,.out(outM), .zr(zr),.ng(ng) );
-assign writeM = instr[3];
+assign writeM = (instr[15]&instr[3]);
 programcounter  pc1(.in(Areg_out[14:0]), .load(loadpc),.clk(clk) ,.reset(reset), .out(pc));
 
 assign addressM = Areg_out[14:0];
