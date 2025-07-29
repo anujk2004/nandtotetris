@@ -67,8 +67,11 @@ Each `check` test case has two versions:
 
 ### Assembler Logic:
 A instruction![Assembler Logic](https://github.com/anujk2004/nandtotetris/blob/main/images/Ainstruct.png)
+
 C instruction![Assembler Logic](https://github.com/anujk2004/nandtotetris/blob/main/images/Cinstruct.png)
+
 Predefined Symbols ![Assembler Logic](https://github.com/anujk2004/nandtotetris/blob/main/images/predefinedsymb.png)
+
 ---
 ## Additional Components
 
