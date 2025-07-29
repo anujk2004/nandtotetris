@@ -23,8 +23,8 @@ Performs arithmetic and logic operations:
 ---
 
 ###  CPU and Memory
-Screen & RAM16 have the same internal logic or input/output interface, but are instantiated with different memory addresses.
-While keyboard is just Reading and not writing.
+`Screen` & `RAM16` have the same internal logic or input/output interface, but are instantiated with different memory addresses.
+ The `Keyboard` module is **read-only**.
 | CPU | Memory |
 |-----|--------|
 |CPU (Toplevel) ![CPU](https://github.com/anujk2004/nandtotetris/blob/main/images/cputop.png) | ![Memory](https://github.com/anujk2004/nandtotetris/blob/main/images/mem.png) |
