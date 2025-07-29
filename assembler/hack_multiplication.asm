@@ -24,9 +24,9 @@ M=D
 @i
 D=M       // D = i
 @R1
-D=D-M     // D = i - R1
-@FINALRESULT1
-D;JEQ     // if i == R1, end loop
+D=D-M   
+@FINALRESULT
+D;JEQ   
 
 // R3 += R0
 @R0
@@ -41,7 +41,7 @@ M=M+1
 @LOOP
 0;JMP
 
-(FINALRESULT1)
+(FINALRESULT)
 @R3
 D=M
 
@@ -58,12 +58,12 @@ D=A
 @R5
 M=D
 
-(LOOP2)
+(LOOPT)
 @a
 D=M
 @R1
 D=D-M
-@FINALRESULT2
+@FINALRESULTT
 D;JEQ
 
 @R2
@@ -74,12 +74,12 @@ M=D+M
 @a
 M=M+1
 
-@LOOP2
+@LOOPT
 0;JMP
 
 
 
-(FINALRESULT2)
+(FINALRESULTT)
 @R5
 D=M
 @R4

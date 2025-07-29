@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 //dest
 char destM [3]={'0','0','1'};
@@ -40,12 +41,34 @@ char jmp[3]={'1','1','1'};
 
 void bininstruct(char *buffer , int size ,FILE *pFile, FILE *pFileout);
 void remove_spaces(char *str );
-void atvalue(int count);
+void atvalue(int count , char *buffer);
+void label( char *buffer , int size , FILE *pFile);
+
+
+typedef struct{
+    char label[100];
+    int address;
+}lbl;
+
+typedef struct{
+    char var[100];
+    int varaddr;
+}variable;
+
+variable totalvar[10000];
+int varcount=16;
+
+lbl totollabel[10000];
+int lblcount =0;
+int value;
+int count=0;
+
+
 int main(){
     //printf("start\n");
 
-    FILE *pFile = fopen("check1.asm", "r");
-    FILE *pFileout= fopen("E:\\nand2tetris\\assembler\\output.hack", "w");
+    FILE *pFile = fopen("check4rect_lab.asm", "r");
+    FILE *pFileout= fopen("E:\\nand2tetris\\assembler\\outputrectL.hack", "w");
         if(pFileout == NULL){
         printf("Could not open file\n");
        return 1;
@@ -57,9 +80,11 @@ int main(){
         return 1;
     }
 
+    //label(buffer , sizeof(buffer), pFile);
+     label(buffer , sizeof(buffer) ,pFile);
+    rewind(pFile);
+     bininstruct(buffer , sizeof(buffer) ,pFile , pFileout);
 
-    bininstruct(buffer , sizeof(buffer) ,pFile , pFileout);
-    
       fclose(pFileout);
       fclose(pFile);
 return 0;
@@ -67,7 +92,8 @@ return 0;
 
 void bininstruct(char *buffer , int size , FILE *pFile, FILE *pFileout){
 
-     int count=0;
+    
+   count =0;
     while (fgets(buffer, size, pFile)){
 
         remove_spaces(buffer );
@@ -79,7 +105,7 @@ void bininstruct(char *buffer , int size , FILE *pFile, FILE *pFileout){
         continue;
          }
            
-        
+       
      
         //printf("here");
         char binary[17] = {0}; 
@@ -111,18 +137,35 @@ void bininstruct(char *buffer , int size , FILE *pFile, FILE *pFileout){
        
         char *at = strstr(buffer,"@");
         char *labels = strstr(buffer,"(");
-        int value  ; 
         
         
-    
-          atvalue(count);
-         count ++;
-            
         
-   
-    
-           if (at) {
+        
 
+           
+         
+
+            if (labels){
+                char labelname[100];
+                for(int i=0; i< (strlen(labels)-1); i++){
+                    labelname[i]=labels[i];
+                }
+                labelname[strlen(labels)-1]='\0';
+               // printf("%s", labelname);
+                strcpy(totollabel[lblcount].label,&labelname[1]);
+                totollabel[lblcount].address = count ;
+                //printf("%d",totollabel[lblcount].address);
+               lblcount++;
+                
+                continue;
+              //  lblcount= count;
+        }
+       
+             atvalue(count , buffer);
+         count ++;
+
+           if (at) {
+            
             //existing symbol table
             char *Rreg =strstr(at,"R"); //reg R0..R15
             char *screen = strstr(at,"SCREEN");
@@ -132,30 +175,68 @@ void bininstruct(char *buffer , int size , FILE *pFile, FILE *pFileout){
             char *arg = strstr(at , "ARG");
             char *this = strstr(at , "THIS");
             char *that = strstr(at , "THAT");
-            if(at[1] =='0'|| at[1] =='1'|| at[1] =='2'|| at[1] =='3'|| at[1] =='4'|| at[1] =='5'|| at[1] =='6'|| at[1] =='7'|| at[1] =='8'|| at[1] =='9')
-             {value = atoi(&at[1]);}
-            if(Rreg){
+            
+                if(Rreg && isdigit(Rreg[1]) ){
                 value=atoi(&Rreg[1]);
                 if(value >15){
                     printf(" no reg exist");
                     value = -1;
                 }
             }
-            if (screen){value = 16384;}
-            else if(kbd){value = 24576;}
+             else if(isdigit(at[1]))
+             {value = atoi(&at[1]);}
+             else if (screen){value = 16384;}
+             else if(kbd){value = 24576;}
              else if (sp){value = 0;}
              else if (lcl){value = 1;}
              else if (arg){value = 2;}
              else if (this){value = 3;}
-            else if (that){value = 4;}
+             else if (that){value = 4;}
+             
+             else if (isupper(at[1])){
+               // printf("label address");
+                char atlabelname[100];
+                strcpy(atlabelname,&at[1]);
+              //  printf(" @%s",atlabelname);
+                    for (int i =0; i<=lblcount;i++){
+                    if (strcmp(atlabelname, totollabel[i].label)==0){
+                        value = totollabel[i].address;
+                      
+                    }}
+                
+               // printf(" %d",value);
  
+        
+           }
+           else if(islower(at[1])){
+          //  printf(" variable %s" , at);
+            int found =0;
+           
+           
+        for(int i =0 ; i <= varcount ; i++){
+                if(strcmp(&at[1] ,totalvar[i].var )==0){
+                    value = totalvar[i].varaddr;
+                    found =1;
+                    break;
+
+                } 
+            }
+             if (found ==0){
+            strcpy(totalvar[varcount].var , &at[1]);
+            totalvar[varcount].varaddr = varcount;
+            value = totalvar[varcount].varaddr;
+            varcount++;
+            }
+       
+           }
+     
     
         }
-
+        
             for (int i = 15; i >=0; i--) {
                binary[15- i] = ((value >> i) & 1) ? '1' : '0';}
-          // snprintf(buffer, size, "%s\n", binary);
-         
+         // snprintf(buffer, size, "%s\n", binary);
+          
          
         
         if(buffer[0]== 'M'|| buffer[0]=='A'||buffer[0]=='D' || buffer[0]=='0'){
@@ -331,13 +412,13 @@ if(semicol){
         for(int i=0; i<sizeof(jgt);i++){
             binary[13+i]=jmp[i];}}
     }
-       
+     
        snprintf(buffer, size, "%s\n", binary);
         printf("  %s",buffer); 
         fprintf(pFileout, "%s", buffer);
       
-    }   
-   
+    }  
+
     fclose(pFileout);
     fclose(pFile);
 }
@@ -350,12 +431,52 @@ void remove_spaces(char *str ) {
         if (*j != ' ' && *j != '\t' && *j != '\n' && *j != '\r') {
             *i = *j;
             i++;
-        }
-           j++;
+        }  j++;
     }  
     *i = 0;         
 }
 
-void atvalue(int count){
-    printf("%d",count);
+void atvalue(int count , char *buffer){
+    char *label = strstr(buffer, "(")  ;
+    if (!label){
+        printf("%d",count);}
+}
+
+void label( char *buffer  , int size , FILE *pFile){
+    
+     count =0;
+    while(fgets(buffer,size, pFile)){
+        remove_spaces(buffer);
+        char *newline= strstr(buffer,"//");
+         if (newline){
+            *newline='\0';
+         }
+        if(buffer[0]=='\0'){
+        continue;
+    }
+          
+       // printf("here");
+        char *at = strstr(buffer,"@" );
+          char *labels = strstr(buffer,"(");
+        
+printf("%s",labels);
+            if (labels){
+                char labelname[100];
+                for(int i=0; i< (strlen(labels)-1); i++){
+                    labelname[i]=labels[i];
+                }
+                labelname[strlen(labels)-1]='\0';
+               // printf("%s", &labelname[1]);
+  
+                strcpy(totollabel[lblcount].label,&labelname[1]);
+                totollabel[lblcount].address = count;
+               // printf(" %d",totollabel[lblcount].address);
+                lblcount++;
+                
+                continue;
+              //  lblcount= count;
+        }
+ atvalue(count , buffer);
+       count++;
+    }
 }
