@@ -13,21 +13,31 @@ void addsubandor(char type , FILE *pFileout);
 void eqltgt(char *type ,int count, FILE *pFileout);
 void negnot(char type , FILE *pFileout);
 
-char filename[] =  "checkpointertest.vm";
+char filename[] =  "checkstatictest.vm";
 char stfile[sizeof(filename)];
-
+char outfile[sizeof(filename)+5]={0};
 int main(){
-    
+    char asmf[5]=".asm";
+    char temp [sizeof(filename)];
+    for (int i=0; i< (strlen(filename)-2) ; i++){
+        temp[i]= filename[i];
+    }
+   
+    strcpy(outfile, temp);
+    for (int i = 0;i<5;i++){
+        outfile[strlen(filename)-3+i]= asmf[i];
+    }
+   // printf("%s",outfile);
     FILE *pFile = fopen(filename, "r");
-    FILE *pFileout= fopen("pointertest.asm", "w");
+    FILE *pFileout= fopen(outfile, "w");
     char buffer[1024];
         if(pFileout == NULL){
-        printf("Could not open file\n");
+        printf("Could not open fileout\n");
        return 1;
         }
 
          if(pFile == NULL){
-        printf("Could not open file\n");
+        printf("Could not open filein\n");
        return 1;
         }
         check(buffer ,sizeof(buffer) ,pFile , pFileout);
@@ -158,7 +168,9 @@ void popsegment( char *buffer , FILE *pFileout){
 void pushsegment(char *buffer, FILE *pFileout){
     // printf("%s" , buffer);
     for (int i=0; i< (strlen(filename)-3); i++){
-    stfile[i]= filename[i];}
+    stfile[i]= filename[i];
+    }
+    
 
     int storevalue;
     char *constant = strstr( buffer, "constant");
